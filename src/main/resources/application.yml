@@ -1,6 +1,11 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://rm-wz98sj0k1997ci6v95o.mysql.rds.aliyuncs.com:3306/books
+    url: jdbc:mysql://rm-wz98sj0k1997ci6v95o.mysql.rds.aliyuncs.com:3306/newbooks?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: Huluobowodi123
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
