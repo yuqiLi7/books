@@ -17,7 +17,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Reader checkReader(String phone, String password) {
-        Reader user = readerRepository.findByIDAndPassword(phone, MD5Utils.code(password));
+        Reader user = readerRepository.findByPhoneAndPassword(phone, MD5Utils.code(password));
         return user;
     }
 }
