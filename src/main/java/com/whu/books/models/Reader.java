@@ -1,5 +1,6 @@
 package com.whu.books.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,10 +26,14 @@ public class Reader {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(nullable = false)
     private String phone;
     @Column(nullable = false)
     private String password;
+
+    @OneToOne(mappedBy = "reader", cascade = CascadeType.REMOVE)
+    @JsonIgnoreProperties({"reader"})
+    private LendInfo lendInfo;
 
     private String name;
     private String sex;

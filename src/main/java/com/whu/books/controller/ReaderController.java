@@ -4,15 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.whu.books.models.Book;
+import com.whu.books.models.LendInfo;
 import com.whu.books.models.Reader;
 import com.whu.books.repository.BookRepository;
+import com.whu.books.repository.LendInfoRepository;
 import com.whu.books.repository.ReaderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +36,9 @@ public class ReaderController {
 
     @Autowired
     ReaderRepository readerRepository;
+
+    @Autowired
+    LendInfoRepository lendInfoRepository;
 
     /**
      * 按书名关键字搜索书籍
@@ -65,7 +71,30 @@ public class ReaderController {
     }
 
     /**
-     *  获取当前用户的信息
+     * 搜索当前用户的借阅记录
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/searchRent")
+    public List<JsonNode> searchRent(@RequestParam Long id) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<JsonNode> nodes = lendInfoRepository.findByReader(readerRepository.findById(id).get()).stream().map(info -> {
+            ObjectNode node = mapper.createObjectNode();
+            node.put("id", info.getId());
+            node.put("key", info.getId());
+            node.put("name", info.getBook().getName());
+            node.put("reader", info.getReader().getName());
+            node.put("lendDate", info.getLendDate().toLocalDate().toString());
+            node.put("backDate", info.getBackDate().toLocalDate().toString());
+            return node;
+        }).collect(Collectors.toList());
+        return nodes;
+    }
+
+    /**
+     * 获取当前用户的信息
+     *
      * @param id
      * @return
      */
@@ -82,23 +111,13 @@ public class ReaderController {
         return node;
     }
 
-    /**
-     *  修改用户信息
-     * @param node
-     * @return
-     */
-    @PutMapping("/readerInfo")
-    public String readerInfo(@RequestBody JsonNode node){
-        JsonNode data = node.get("reader");
-        Reader reader = readerRepository.findById(data.get("id").asLong()).get();
-        LocalDateTime time = LocalDate.parse(data.get("birth").asText().substring(0,10)).atStartOfDay();
-        reader.setBirth(time);
-        reader.setName(data.get("name").asText());
-        reader.setAddress(data.get("address").asText());
-        reader.setPhone(data.get("phone").asText());
-        reader.setSex(data.get("sex").asText());
-        Reader reader1 = readerRepository.save(reader);
-        System.out.println("reader1 = " + reader1);
-        return "200";
+    @GetMapping("/rentBook")
+    public String rentBook(@RequestParam Long readerId, @RequestParam Long bookId) {
+        LendInfo info = new LendInfo();
+        info.setBook(bookRepository.findById(bookId).get());
+        info.setReader(readerRepository.findById(readerId).get());
+        info.setLendDate(LocalDateTime.now());
+        lendInfoRepository.save(info);
+        return "{code: \"200\"}";
     }
 }
