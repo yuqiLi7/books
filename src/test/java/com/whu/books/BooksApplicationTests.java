@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 @SpringBootTest
 class BooksApplicationTests {
@@ -17,10 +18,7 @@ class BooksApplicationTests {
      */
     @Test
     public void testMD5(){
-        String password = "123243546342";
-        System.out.println("password = " + password);
-        String encoded = MD5Utils.code(password);
-        System.out.println("encoded = " + encoded);
-        assert encoded.equals("087adceb109a6642c417d79fde3a78f5");
+        LocalDate date = LocalDate.parse("2020-05-14");
+        System.out.println("date = " + date.atStartOfDay());
     }
 }
