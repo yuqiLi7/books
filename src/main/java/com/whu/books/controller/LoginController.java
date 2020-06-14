@@ -5,6 +5,7 @@ import com.whu.books.models.Admin;
 import com.whu.books.models.Reader;
 import com.whu.books.repository.AdminRepository;
 import com.whu.books.repository.ReaderRepository;
+import com.whu.books.util.MD5Utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +44,7 @@ public class LoginController {
             // 读者登录
             String phone = node.get("phone").asText();
             String password = node.get("password").asText();
-            Reader reader = readerRepository.findByPhoneAndPassword(phone, password);
+            Reader reader = readerRepository.findByPhoneAndPassword(phone, MD5Utils.code(password));
             if (reader != null) {
                 return new Res(type, "ok", type, reader.getId(), reader.getName());
             } else {
@@ -53,7 +54,7 @@ public class LoginController {
             // 管理员登录
             String phone = node.get("phone").asText();
             String password = node.get("password").asText();
-            Admin admin = adminRepository.findByPhoneAndPassword(phone, password);
+            Admin admin = adminRepository.findByPhoneAndPassword(phone, MD5Utils.code(password));
             if (admin != null) {
                 return new Res(type, "ok", type, admin.getId(), "管理员");
             } else {
