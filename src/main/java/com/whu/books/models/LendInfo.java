@@ -1,14 +1,12 @@
 package com.whu.books.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -23,8 +21,10 @@ public class LendInfo{
     private long id;
     @OneToOne
     private Book book;
-    @OneToOne
+    @ManyToOne
+    @JsonIgnoreProperties({"lendInfo"})
     private Reader reader;
     private LocalDateTime lendDate;
+
     private LocalDateTime backDate;
 }

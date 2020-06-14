@@ -1,8 +1,13 @@
 package com.whu.books.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.whu.books.models.Admin;
+import com.whu.books.models.Reader;
 import com.whu.books.repository.AdminRepository;
 import com.whu.books.repository.ReaderRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +31,51 @@ public class LoginController {
     @Autowired
     ReaderRepository readerRepository;
 
+    /**
+     *  处理登录逻辑
+     * @param node
+     * @return
+     */
     @PostMapping("")
-    public String login(@RequestBody JsonNode node) {
-        return "用户名: " + node.get("username") + " 密码: " + node.get("password");
+    public Res login(@RequestBody JsonNode node) {
+        String type = node.get("type").asText();
+        if (type.equals("reader")) {
+            // 读者登录
+            String phone = node.get("phone").asText();
+            String password = node.get("password").asText();
+            Reader reader = readerRepository.findByPhoneAndPassword(phone, password);
+            if (reader != null) {
+                return new Res(type, "ok", type, reader.getId(), reader.getName());
+            } else {
+                return new Res("error");
+            }
+        } else if (type.equals("admin")) {
+            // 管理员登录
+            String phone = node.get("phone").asText();
+            String password = node.get("password").asText();
+            Admin admin = adminRepository.findByPhoneAndPassword(phone, password);
+            if (admin != null) {
+                return new Res(type, "ok", type, admin.getId(), "管理员");
+            } else {
+                return new Res("error");
+            }
+        } else {
+            return new Res("error");
+        }
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    class Res {
+        String currentAuthority;
+        String status;
+        String type;
+        Long id;
+        String name;
+
+        public Res(String currentAuthority) {
+            this.currentAuthority = currentAuthority;
+        }
     }
 }

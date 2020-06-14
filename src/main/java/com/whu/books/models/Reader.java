@@ -1,5 +1,6 @@
 package com.whu.books.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @class Reader
@@ -31,9 +33,9 @@ public class Reader {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(mappedBy = "reader", cascade = CascadeType.REMOVE)
-    @JsonIgnoreProperties({"reader"})
-    private LendInfo lendInfo;
+    @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"reader","book"})
+    private List<LendInfo> lendInfo;
 
     private String name;
     private String sex;

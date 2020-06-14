@@ -104,7 +104,9 @@ public class ManagementController {
             node.put("name", rent.getBook().getName());
             node.put("reader", rent.getReader().getName());
             node.put("lendDate", rent.getLendDate().toLocalDate().toString());
-            node.put("backDate", rent.getBackDate().toLocalDate().toString());
+            if (rent.getBackDate() != null) {
+                node.put("backDate", rent.getBackDate().toLocalDate().toString());
+            }
             return node;
         }).collect(Collectors.toList());
         return nodes;
@@ -140,20 +142,21 @@ public class ManagementController {
     @PutMapping("/reader")
     public String updateReader(@RequestBody JsonNode node) {
         JsonNode data = node.get("reader");
-        Reader reader = readerRepository.findById(data.get("id").asLong()).get();
+        Long id = data.get("id").asLong();
+        Reader reader = readerRepository.findById(id).get();
         LocalDateTime time = LocalDate.parse(data.get("birth").asText().substring(0, 10)).atStartOfDay();
         reader.setBirth(time);
         reader.setName(data.get("name").asText());
         reader.setAddress(data.get("address").asText());
         reader.setPhone(data.get("phone").asText());
         reader.setSex(data.get("sex").asText());
-        System.out.println("reader = " + reader);
         readerRepository.save(reader);
         return "{code: \"200\"}";
     }
 
     /**
-     *  删除一个读者
+     * 删除一个读者
+     *
      * @param id
      * @return
      */
@@ -165,11 +168,12 @@ public class ManagementController {
 
     /**
      * 添加一本书
+     *
      * @param node
      * @return
      */
     @PostMapping("/book")
-    public String addBook(@RequestBody JsonNode node){
+    public String addBook(@RequestBody JsonNode node) {
         JsonNode data = node.get("book");
         Book book = new Book();
         book.setIsbn(data.get("isbn").asText());
@@ -183,8 +187,13 @@ public class ManagementController {
         return "{code: \"200\"}";
     }
 
+    /**
+     *  修改图书
+     * @param node
+     * @return
+     */
     @PutMapping("/book")
-    public String updateBook(@RequestBody JsonNode node){
+    public String updateBook(@RequestBody JsonNode node) {
         JsonNode data = node.get("book");
         Book book = bookRepository.findById(Long.valueOf(data.get("id").asText())).get();
         book.setIsbn(data.get("isbn").asText());
@@ -198,10 +207,22 @@ public class ManagementController {
         return "{code: \"200\"}";
     }
 
+    /**
+     *  删除图书
+     * @param id
+     * @return
+     */
     @DeleteMapping("/book")
-    public String deleteBook(@RequestParam Long id){
+    public String deleteBook(@RequestParam Long id) {
         bookRepository.deleteById(id);
         return "{code: \"200\"}";
+    }
+
+
+    @GetMapping("/reader")
+    public Reader reader(@RequestParam Long id){
+        Reader reader = readerRepository.findById(id).get();
+        return reader;
     }
 
 }

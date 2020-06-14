@@ -1,5 +1,6 @@
 package com.whu.books.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,8 +34,8 @@ public class Book {
     private BigDecimal price;
     private LocalDateTime publishDate;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE)
-    @JsonIgnoreProperties({"book"})
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    @JsonIgnore
     private LendInfo lendInfo;
 
     @OneToOne
